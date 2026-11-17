@@ -34,23 +34,30 @@ async function main() {
   const app = express();
   const server = http.createServer(app);
 
+  const corsOptions = {
+    origin: true, // Automatically reflect request origin (allows localhost, Vercel, and custom domains)
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "x-admin-token"],
+  };
+
   const io = new Server(server, {
-    cors: {
-      origin: CORS_ORIGIN,
-      methods: ["GET", "POST"],
-      credentials: true,
-    },
+    cors: corsOptions,
   });
 
   setupCompetitionSocket(io);
 
-  app.use(
-    cors({
-      origin: CORS_ORIGIN,
-      methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-    }),
-  );
+  app.use(cors(corsOptions));
   app.use(express.json({ limit: "1mb" }));
+
+  app.get("/", (req, res) => {
+    res.json({
+      status: "online",
+      service: "Typing Master API",
+      version: "1.0.0",
+      time: new Date().toISOString(),
+    });
+  });
 
   app.use("/api", apiRouter);
 

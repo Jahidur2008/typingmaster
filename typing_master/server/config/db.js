@@ -6,7 +6,9 @@
 
 const mongoose = require("mongoose");
 
-const DEFAULT_URI = "mongodb://127.0.0.1:27017/typing-master";
+const DEFAULT_URI =
+  process.env.MONGODB_URI ||
+  "mongodb+srv://limonmalitha1_db_user:G7AKojyzSoxQQpfD@cluster0.zzcikpt.mongodb.net/typing_master?retryWrites=true&w=majority";
 
 let connected = false;
 let memServer = null;
