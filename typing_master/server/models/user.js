@@ -4,7 +4,7 @@ require("./badge");
 
 const userSchema = new mongoose.Schema(
   {
-    firebaseUid: { type: String, index: true, sparse: true },
+    firebaseUid: { type: String, index: true, unique: true, sparse: true },
     name: { type: String, trim: true },
     email: {
       type: String,

@@ -96,14 +96,12 @@ router.patch("/me", requireAuth, async (req, res, next) => {
     const body = req.body || {};
     const cleanEmail = email ? email.trim().toLowerCase() : undefined;
 
-    let user = await User.findOne({ firebaseUid: uid }).populate("badges");
-
-    if (!user && cleanEmail) {
-      user = await User.findOne({ email: cleanEmail }).populate("badges");
-      if (user) {
-        user.firebaseUid = uid;
-      }
-    }
+    let user = await User.findOne({
+      $or: [
+        { firebaseUid: uid },
+        ...(cleanEmail ? [{ email: cleanEmail }] : []),
+      ],
+    }).populate("badges");
 
     if (!user) {
       user = new User({
@@ -118,6 +116,8 @@ router.patch("/me", requireAuth, async (req, res, next) => {
         badges: [],
       });
     } else {
+      if (!user.firebaseUid) user.firebaseUid = uid;
+      if (cleanEmail && !user.email) user.email = cleanEmail;
       if (typeof body.name === "string" && body.name.trim().length > 0) {
         user.name = body.name.trim();
       }

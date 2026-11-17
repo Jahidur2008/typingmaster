@@ -5,6 +5,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -67,10 +68,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
+  const syncLockRef = useRef<string | null>(null);
 
   // Sync user with backend MongoDB
   const syncWithBackend = useCallback(
     async (fbUser: FirebaseUser, idToken: string, extraData?: { name?: string }) => {
+      // Prevent concurrent duplicate sync calls for the same user
+      if (syncLockRef.current === fbUser.uid) {
+        return null;
+      }
+      syncLockRef.current = fbUser.uid;
       setSyncing(true);
       try {
         const response = await fetch(`${API_URL}/api/auth/sync`, {
@@ -96,6 +103,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.warn("[auth-context] Unable to sync with backend server:", err);
       } finally {
         setSyncing(false);
+        setTimeout(() => {
+          if (syncLockRef.current === fbUser.uid) {
+            syncLockRef.current = null;
+          }
+        }, 1500);
       }
       return null;
     },
