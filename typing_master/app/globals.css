@@ -1,0 +1,175 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ */
+/*  Typing Master — Global Design System                               */
+/*  Monkeytype-inspired minimal dark UI                                */
+/* ------------------------------------------------------------------ */
+
+/* ---------- Theme tokens (dark is the default) ---------- */
+:root {
+  /* Core palette */
+  --bg: #323437;
+  --surface: #2c2e31;
+  --surface-2: #383a3e;
+  --text: #d1d0c5;
+  --subtext: #646669;
+  --main: #e2b714; /* accent / primary */
+  --error: #ca4754;
+  --correct: #57c793;
+
+  /* Derived tokens */
+  --border: color-mix(in srgb, var(--text) 8%, transparent);
+  --grid-line: color-mix(in srgb, var(--text) 5%, transparent);
+  --glow: color-mix(in srgb, var(--main) 7%, transparent);
+  --selection: color-mix(in srgb, var(--main) 30%, transparent);
+}
+
+[data-theme="light"] {
+  --bg: #e8e6e1;
+  --surface: #f4f3ef;
+  --surface-2: #dddbd5;
+  --text: #353431;
+  --subtext: #8d8c86;
+  --main: #d9a912;
+  --error: #c2424f;
+  --correct: #2e9b77;
+}
+
+/* ---------- Tailwind v4 theme mapping ---------- */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-text: var(--text);
+  --color-subtext: var(--subtext);
+  --color-main: var(--main);
+  --color-error: var(--error);
+  --color-correct: var(--correct);
+  --color-border: var(--border);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+  --font-bangla: var(--font-noto-bengali), var(--font-inter), sans-serif;
+
+  --animate-caret-blink: caret-blink 1s step-end infinite;
+  --animate-rise: rise 0.5s ease-out both;
+
+  @keyframes caret-blink {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* ---------- Base ---------- */
+html[data-scroll-behavior="smooth"] {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+::selection {
+  background: var(--selection);
+  color: var(--text);
+}
+
+/* Subtle themed scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-2) transparent;
+}
+
+/* Typing-area caret, reuse anywhere: <span className="caret" /> */
+.caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.15em;
+  background: var(--main);
+  vertical-align: text-bottom;
+  animation: var(--animate-caret-blink);
+}
+
+/* Typing surface: family/size/line-height are user settings, exposed as
+   CSS vars by the settings store (with sensible defaults). */
+.font-typing {
+  font-family:
+    var(--typing-font-family, var(--font-jetbrains-mono)),
+    var(--font-noto-bengali),
+    ui-monospace,
+    monospace;
+}
+
+/* ---------- Background effects (aceternity-style, kept subtle) ---------- */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+.mask-fade-radial {
+  mask-image: radial-gradient(ellipse 75% 65% at 50% 35%, black 25%, transparent 78%);
+}
+
+.glow-accent {
+  background: radial-gradient(
+    ellipse 60% 45% at 50% 0%,
+    var(--glow),
+    transparent 70%
+  );
+}
+
+/* ---------- Accessibility (a11y) & Focus States ---------- */
+:focus-visible {
+  outline: 2px solid var(--main);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  html,
+  html[data-scroll-behavior="smooth"] {
+    scroll-behavior: auto !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Hide Next.js dev tools indicator badge */
+nextjs-portal,
+#nextjs-portal,
+[data-nextjs-dev-tools-button],
+[data-next-badge] {
+  display: none !important;
+}

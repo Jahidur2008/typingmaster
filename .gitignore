@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Next.js build outputs
+.next/
+**/.next/
+out/
+**/out/
+build/
+**/build/
+
+# Environment variables & sensitive credentials
+.env
+.env*.local
+*.env
+!.env.example
+!**/.*.example
+*serviceAccountKey*.json
+!*serviceAccountKey.example.json
+*.pem
+*.key
+
+# Logs & temp files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+*.tsbuildinfo
+next-env.d.ts
+.DS_Store
+Thumbs.db

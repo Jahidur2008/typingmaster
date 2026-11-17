@@ -1,0 +1,15 @@
+{
+  "name": "typing-master",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Typing Master - Minimalist Bilingual Typing Platform",
+  "scripts": {
+    "dev": "npm --prefix typing_master run dev",
+    "dev:frontend": "npm --prefix typing_master run dev",
+    "dev:backend": "npm --prefix typing_master/server run dev",
+    "dev:all": "node dev-all.js",
+    "build": "npm --prefix typing_master run build",
+    "start": "npm --prefix typing_master start",
+    "server": "node typing_master/server/server.js"
+  }
+}
