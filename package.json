@@ -11,5 +11,8 @@
     "build": "npm --prefix typing_master run build",
     "start": "npm --prefix typing_master start",
     "server": "node typing_master/server/server.js"
+  },
+  "dependencies": {
+    "mongodb": "^7.9.0"
   }
 }
