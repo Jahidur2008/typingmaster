@@ -1,6 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const { connectionState } = require("../config/db");
+const { connectionState, getLastError, getMaskedUri } = require("../config/db");
 
 const router = express.Router();
 
@@ -17,6 +17,8 @@ router.get("/health", (req, res) => {
       state: STATES[state] ?? "unknown",
       connected,
       name: mongoose.connection.name || null,
+      target: getMaskedUri(),
+      error: getLastError(),
     },
     uptime: Math.round(process.uptime()),
     timestamp: new Date().toISOString(),

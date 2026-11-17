@@ -21,14 +21,15 @@ const CORS_ORIGIN = process.env.CORS_ORIGIN || "http://localhost:3000";
 async function main() {
   // Start even if the database is unreachable — /api/health reports the
   // degraded state and Mongoose keeps retrying in the background.
+  // Register all Mongoose models immediately
+  require("./models");
+
   try {
     await connectDB();
-    // Register all Mongoose models
-    require("./models");
     await seedChallenges();
     await seedLeaderboard();
   } catch (err) {
-    console.warn(`[server] continuing without database — ${err.message}`);
+    console.warn(`[server] initial db connection failed (${err.message}) — background retry active`);
   }
 
   const app = express();

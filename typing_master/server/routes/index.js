@@ -15,22 +15,33 @@ const Setting = require("../models/setting");
 const router = express.Router();
 
 // Public site settings
-router.get("/settings", async (req, res, next) => {
+router.get("/settings", async (req, res) => {
   try {
-    let setting = await Setting.findOne({ key: "site_config" });
-    if (!setting) {
-      setting = await Setting.create({ key: "site_config" });
+    let setting = null;
+    const mongoose = require("mongoose");
+    if (mongoose.connection.readyState === 1) {
+      setting = await Setting.findOne({ key: "site_config" }).maxTimeMS(3000);
+      if (!setting) {
+        setting = await Setting.create({ key: "site_config" });
+      }
     }
     return res.json({
-      siteName: setting.siteName,
-      logoUrl: setting.logoUrl,
-      defaultTheme: setting.defaultTheme,
-      maintenanceMode: setting.maintenanceMode,
-      languages: setting.languages,
-      layouts: setting.layouts,
+      siteName: setting?.siteName || "Typing Master",
+      logoUrl: setting?.logoUrl || "",
+      defaultTheme: setting?.defaultTheme || "obsidian",
+      maintenanceMode: setting?.maintenanceMode || false,
+      languages: setting?.languages || ["english", "bangla_avro", "bangla_bijoy"],
+      layouts: setting?.layouts || ["qwerty"],
     });
   } catch (err) {
-    return next(err);
+    return res.json({
+      siteName: "Typing Master",
+      logoUrl: "",
+      defaultTheme: "obsidian",
+      maintenanceMode: false,
+      languages: ["english", "bangla_avro", "bangla_bijoy"],
+      layouts: ["qwerty"],
+    });
   }
 });
 

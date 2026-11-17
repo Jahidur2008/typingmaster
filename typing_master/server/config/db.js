@@ -12,9 +12,21 @@ const DEFAULT_URI =
 
 let connected = false;
 let memServer = null;
+let lastError = null;
+let lastErrorTime = null;
+let retryTimer = null;
+
+function getLastError() {
+  return lastError ? `${lastError} (at ${lastErrorTime})` : null;
+}
+
+function getMaskedUri() {
+  const uri = process.env.MONGODB_URI || DEFAULT_URI;
+  return uri.replace(/:([^@]+)@/, ":****@");
+}
 
 async function connectDB(uri) {
-  if (connected) return mongoose.connection;
+  if (connected && mongoose.connection.readyState === 1) return mongoose.connection;
   const connectionUri = uri || process.env.MONGODB_URI || DEFAULT_URI;
 
   mongoose.set("strictQuery", true);
@@ -24,22 +36,29 @@ async function connectDB(uri) {
       serverSelectionTimeoutMS: 15000,
     });
     connected = true;
+    lastError = null;
+    lastErrorTime = null;
 
     const { host, name, port } = conn.connection;
     console.log(`[db] MongoDB connected → ${host}:${port}/${name}`);
 
     mongoose.connection.on("error", (err) => {
+      lastError = err.message;
+      lastErrorTime = new Date().toISOString();
       console.error("[db] MongoDB runtime error:", err.message);
     });
     mongoose.connection.on("disconnected", () => {
       connected = false;
-      console.warn("[db] MongoDB disconnected");
+      console.warn("[db] MongoDB disconnected — attempting reconnect in 5s...");
+      scheduleRetry();
     });
 
     return conn;
   } catch (err) {
+    lastError = err.message;
+    lastErrorTime = new Date().toISOString();
     console.warn(
-      `[db] Primary connection to "${connectionUri}" failed: ${err.message}`,
+      `[db] Connection to "${getMaskedUri()}" failed: ${err.message}`,
     );
 
     // Development fallback to in-memory MongoDB
@@ -89,11 +108,32 @@ async function connectDB(uri) {
       }
     }
 
+    scheduleRetry();
     throw err;
   }
 }
 
+function scheduleRetry() {
+  if (retryTimer) return;
+  retryTimer = setTimeout(async () => {
+    retryTimer = null;
+    if (!connected || mongoose.connection.readyState !== 1) {
+      console.log("[db] Retrying MongoDB connection...");
+      try {
+        await connectDB();
+        console.log("[db] Reconnected to MongoDB successfully!");
+      } catch (e) {
+        // scheduleRetry was called inside catch
+      }
+    }
+  }, 5000);
+}
+
 async function disconnectDB() {
+  if (retryTimer) {
+    clearTimeout(retryTimer);
+    retryTimer = null;
+  }
   if (connected) {
     await mongoose.disconnect();
     connected = false;
@@ -110,4 +150,11 @@ function connectionState() {
   return mongoose.connection.readyState;
 }
 
-module.exports = { connectDB, disconnectDB, connectionState, DEFAULT_URI };
+module.exports = {
+  connectDB,
+  disconnectDB,
+  connectionState,
+  getLastError,
+  getMaskedUri,
+  DEFAULT_URI,
+};
