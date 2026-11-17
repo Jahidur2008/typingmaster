@@ -25,6 +25,10 @@ function getFriendlyErrorMessage(err: unknown): string {
         return "Please enter a valid email address.";
       case "auth/popup-closed-by-user":
         return "Google sign-in was cancelled.";
+      case "auth/popup-blocked":
+        return "Browser popup was blocked. Switching to Google redirect...";
+      case "auth/unauthorized-domain":
+        return "This domain is not authorized in Firebase Console. Please add this Vercel domain under Firebase Console -> Authentication -> Settings -> Authorized Domains.";
       case "auth/network-request-failed":
         return "Network error. Please check your internet connection.";
       default:

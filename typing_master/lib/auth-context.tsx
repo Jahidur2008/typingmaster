@@ -13,6 +13,8 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signOut,
   updateProfile,
   type User as FirebaseUser,
@@ -129,8 +131,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return null;
   }, [user]);
 
-  // Auth state listener
+  // Auth state listener & redirect handler
   useEffect(() => {
+    // Process redirect sign-in result if returning from redirect flow
+    getRedirectResult(auth)
+      .then(async (result) => {
+        if (result?.user) {
+          const idToken = await result.user.getIdToken();
+          setToken(idToken);
+          await syncWithBackend(result.user, idToken);
+        }
+      })
+      .catch((err) => {
+        console.warn("[auth-context] getRedirectResult:", err);
+      });
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
@@ -171,11 +186,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signInWithGoogle = async () => {
-    const cred = await signInWithPopup(auth, googleProvider);
-    const idToken = await cred.user.getIdToken();
-    setToken(idToken);
-    await syncWithBackend(cred.user, idToken);
-    return cred.user;
+    try {
+      const cred = await signInWithPopup(auth, googleProvider);
+      const idToken = await cred.user.getIdToken();
+      setToken(idToken);
+      await syncWithBackend(cred.user, idToken);
+      return cred.user;
+    } catch (err: unknown) {
+      const fbErr = err as { code?: string };
+      if (
+        fbErr?.code === "auth/popup-blocked" ||
+        fbErr?.code === "auth/cancelled-popup-request"
+      ) {
+        console.warn("[auth] Popup blocked by browser. Using redirect instead...");
+        await signInWithRedirect(auth, googleProvider);
+        return {} as FirebaseUser;
+      }
+      throw err;
+    }
   };
 
   const logout = async () => {
