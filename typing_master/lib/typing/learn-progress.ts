@@ -1,3 +1,5 @@
+import { API_URL } from "@/lib/api-config";
+
 export interface LessonProgressItem {
   lessonId: string;
   completed: boolean;
@@ -8,7 +10,6 @@ export interface LessonProgressItem {
 }
 
 const GUEST_LESSONS_KEY = "tm-guest-lessons";
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 export function getGuestLessonProgress(): Record<string, LessonProgressItem> {
   if (typeof window === "undefined") return {};

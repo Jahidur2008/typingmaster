@@ -26,8 +26,7 @@ import { avroPhonetic } from "@/lib/typing/avro-phonetic";
 import { bijoyConvert } from "@/lib/typing/bijoy";
 import { useSettingsStore } from "@/lib/store/settings";
 import { cn } from "@/lib/utils";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+import { API_URL } from "@/lib/api-config";
 
 interface LessonData {
   _id: string;

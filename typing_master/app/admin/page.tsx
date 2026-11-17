@@ -38,8 +38,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { useSettingsStore } from "@/lib/store/settings";
 import { getCountryFlag } from "@/lib/typing/leaderboard";
 import { cn } from "@/lib/utils";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+import { API_URL } from "@/lib/api-config";
 
 type AdminTab =
   | "dashboard"

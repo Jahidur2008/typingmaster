@@ -1,4 +1,5 @@
 import { io, Socket } from "socket.io-client";
+import { API_URL } from "@/lib/api-config";
 
 export interface RacePlayer {
   id: string;
@@ -50,8 +51,7 @@ let socketInstance: Socket | null = null;
 
 export function getCompetitionSocket(): Socket {
   if (!socketInstance) {
-    const serverUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-    socketInstance = io(serverUrl, {
+    socketInstance = io(API_URL, {
       autoConnect: false,
       reconnection: true,
       reconnectionAttempts: 5,

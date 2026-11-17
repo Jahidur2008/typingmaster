@@ -19,6 +19,7 @@ import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { AmbientBackground } from "@/components/ambient-background";
 import { cn } from "@/lib/utils";
+import { API_URL } from "@/lib/api-config";
 
 const WpmChart = dynamic(
   () => import("@/components/wpm-chart").then((m) => m.WpmChart),
@@ -31,8 +32,6 @@ const WpmChart = dynamic(
     ),
   },
 );
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 const MODES = [
   { value: "all", label: "All Modes" },

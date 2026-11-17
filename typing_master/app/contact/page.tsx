@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { AmbientBackground } from "@/components/ambient-background";
 import { Button } from "@/components/ui/button";
+import { API_URL } from "@/lib/api-config";
 
 function GithubIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -24,8 +25,6 @@ function GithubIcon(props: React.SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 const CATEGORIES = [
   { id: "general", label: "General Inquiry", icon: HelpCircle },

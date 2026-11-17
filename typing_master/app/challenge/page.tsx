@@ -35,8 +35,7 @@ import {
 } from "@/lib/typing/gamification";
 import { submitChallengeAttempt } from "@/lib/typing/history";
 import { cn } from "@/lib/utils";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+import { API_URL } from "@/lib/api-config";
 
 const BADGE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Flag: Award,

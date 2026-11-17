@@ -1,5 +1,6 @@
 import type { TypingResults, WpmSample } from "./engine";
 import type { TypingConfig } from "./config";
+import { API_URL } from "@/lib/api-config";
 
 export interface SavedResult {
   _id?: string;
@@ -25,7 +26,6 @@ export interface SavedResult {
 }
 
 const GUEST_STORAGE_KEY = "tm-guest-history";
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 /**
  * Loads guest results stored locally in the browser.
