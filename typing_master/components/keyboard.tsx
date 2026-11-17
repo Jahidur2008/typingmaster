@@ -211,27 +211,29 @@ export function Keyboard({
   return (
     <div
       aria-hidden
-      className={cn("mx-auto w-full max-w-3xl space-y-1.5 select-none", className)}
+      className={cn("mx-auto w-full max-w-3xl select-none overflow-x-auto pb-1 scrollbar-none", className)}
     >
-      {layout.rows.map((row, rowIndex) => (
-        <div key={rowIndex} className="flex gap-1.5">
-          {row.map((keyDef, keyIndex) => {
-            const isTarget = resolvedTargetCode === keyDef.code;
-            const isSelected = selectedKey?.toLowerCase() === keyDef.label.toLowerCase();
+      <div className="min-w-[460px] sm:min-w-0 space-y-1.5">
+        {layout.rows.map((row, rowIndex) => (
+          <div key={rowIndex} className="flex gap-1.5">
+            {row.map((keyDef, keyIndex) => {
+              const isTarget = resolvedTargetCode === keyDef.code;
+              const isSelected = selectedKey?.toLowerCase() === keyDef.label.toLowerCase();
 
-            return (
-              <Key
-                key={keyIndex}
-                keyDef={keyDef}
-                pressed={pressed === keyDef.code}
-                isTarget={isTarget}
-                isSelected={isSelected}
-                onClick={onKeyClick ? () => onKeyClick(keyDef.label) : undefined}
-              />
-            );
-          })}
-        </div>
-      ))}
+              return (
+                <Key
+                  key={keyIndex}
+                  keyDef={keyDef}
+                  pressed={pressed === keyDef.code}
+                  isTarget={isTarget}
+                  isSelected={isSelected}
+                  onClick={onKeyClick ? () => onKeyClick(keyDef.label) : undefined}
+                />
+              );
+            })}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
