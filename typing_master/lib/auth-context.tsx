@@ -200,7 +200,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ) {
         console.warn("[auth] Popup blocked by browser. Using redirect instead...");
         await signInWithRedirect(auth, googleProvider);
-        return {} as FirebaseUser;
+        // Do not resolve so caller doesn't push route before browser redirects
+        return new Promise<FirebaseUser>(() => {});
       }
       throw err;
     }

@@ -95,8 +95,10 @@ function RegisterForm() {
     setGoogleLoading(true);
     setErrorMessage(null);
     try {
-      await signInWithGoogle();
-      router.push(redirectPath);
+      const u = await signInWithGoogle();
+      if (u && u.uid) {
+        router.push(redirectPath);
+      }
     } catch (err) {
       setErrorMessage(getFriendlyErrorMessage(err));
     } finally {

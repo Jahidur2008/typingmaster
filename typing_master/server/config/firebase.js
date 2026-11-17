@@ -90,9 +90,17 @@ function initFirebase() {
     }
   }
 
-  console.warn(
-    "[firebase-admin] Warning: Firebase credentials not found. Authentication routes will reject requests until credentials are provided in server/.env",
-  );
+  // 4. Fallback to public ID token verification with projectId only
+  try {
+    const fallbackProjectId = process.env.FIREBASE_PROJECT_ID || "typing-master-34cd2";
+    app = initializeApp({ projectId: fallbackProjectId }, "typing-master-default");
+    auth = getAuth(app);
+    isConfigured = true;
+    console.log(`[firebase-admin] Initialized fallback auth for project: ${fallbackProjectId}`);
+    return { app, auth, isConfigured };
+  } catch (err) {
+    console.warn(`[firebase-admin] Fallback initialization failed: ${err.message}`);
+  }
 
   return { app: null, auth: null, isConfigured: false };
 }
