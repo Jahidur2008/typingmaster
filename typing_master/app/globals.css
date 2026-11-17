@@ -118,9 +118,7 @@ body {
 .font-typing {
   font-family:
     var(--typing-font-family, var(--font-jetbrains-mono)),
-    var(--font-noto-bengali),
-    ui-monospace,
-    monospace;
+    var(--font-noto-bengali), ui-monospace, monospace;
 }
 
 /* ---------- Background effects (aceternity-style, kept subtle) ---------- */
@@ -132,7 +130,11 @@ body {
 }
 
 .mask-fade-radial {
-  mask-image: radial-gradient(ellipse 75% 65% at 50% 35%, black 25%, transparent 78%);
+  mask-image: radial-gradient(
+    ellipse 75% 65% at 50% 35%,
+    black 25%,
+    transparent 78%
+  );
 }
 
 .glow-accent {
