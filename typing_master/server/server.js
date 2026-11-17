@@ -27,8 +27,8 @@ async function main() {
     require("./models");
     await seedChallenges();
     await seedLeaderboard();
-  } catch {
-    console.warn("[server] continuing without database — /api/health will report degraded");
+  } catch (err) {
+    console.warn(`[server] continuing without database — ${err.message}`);
   }
 
   const app = express();
