@@ -16,7 +16,7 @@ const columns = [
     links: [
       { href: "/competition", label: "Competition" },
       { href: "/leaderboard", label: "Leaderboard" },
-      { href: "/dashboard", label: "Dashboard" },
+      { href: "/profile", label: "Profile" },
       { href: "/history", label: "History" },
     ],
   },

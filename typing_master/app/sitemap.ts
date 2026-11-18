@@ -10,7 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/challenge", changeFrequency: "daily", priority: 0.8 },
     { path: "/competition", changeFrequency: "daily", priority: 0.8 },
     { path: "/leaderboard", changeFrequency: "always", priority: 0.9 },
-    { path: "/dashboard", changeFrequency: "daily", priority: 0.7 },
+    { path: "/profile", changeFrequency: "daily", priority: 0.8 },
     { path: "/history", changeFrequency: "daily", priority: 0.7 },
     { path: "/about", changeFrequency: "monthly", priority: 0.6 },
     { path: "/contact", changeFrequency: "monthly", priority: 0.6 },

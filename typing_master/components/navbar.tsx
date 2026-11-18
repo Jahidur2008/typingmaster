@@ -7,7 +7,6 @@ import {
   ChevronDown,
   Flame,
   History,
-  LayoutDashboard,
   LogIn,
   LogOut,
   Menu,
@@ -207,18 +206,6 @@ export function Navbar() {
                     {/* Nav links */}
                     <div className="py-1">
                       <Link
-                        href="/dashboard"
-                        onClick={() => setDropdownOpen(false)}
-                        className={cn(
-                          "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-subtext transition-colors hover:bg-surface-2 hover:text-text",
-                          isActive(pathname, "/dashboard") && "bg-surface-2 text-main",
-                        )}
-                      >
-                        <LayoutDashboard className="h-4 w-4" />
-                        <span>Dashboard</span>
-                      </Link>
-
-                      <Link
                         href="/profile"
                         onClick={() => setDropdownOpen(false)}
                         className={cn(
@@ -368,14 +355,6 @@ export function Navbar() {
               {user ? (
                 <>
                   <div className="my-1 border-t border-border" />
-                  <Link
-                    href="/dashboard"
-                    onClick={() => setOpen(false)}
-                    className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-subtext hover:text-text"
-                  >
-                    <LayoutDashboard className="h-4 w-4" />
-                    Dashboard
-                  </Link>
                   <Link
                     href="/profile"
                     onClick={() => setOpen(false)}
