@@ -89,6 +89,7 @@ router.post("/", requireAuth, checkMaintenance, async (req, res, next) => {
             errors: Number(s.errors) || 0,
           }))
         : [],
+      keyErrors: body.keyErrors && typeof body.keyErrors === "object" ? body.keyErrors : {},
     });
 
     await testResult.save();
@@ -161,6 +162,92 @@ router.post("/", requireAuth, checkMaintenance, async (req, res, next) => {
         streak: user.streak,
         badges: user.badges,
       },
+    });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/**
+ * GET /api/results/personal-bests
+ * Retrieves all personal best records grouped by mode, subMode, and language.
+ */
+router.get("/personal-bests", requireAuth, async (req, res, next) => {
+  try {
+    const { uid } = req.user;
+    const user = await User.findOne({ firebaseUid: uid });
+    if (!user) {
+      return res.json({ time: [], words: [], quote: [] });
+    }
+
+    const { language } = req.query;
+    const matchUser = { user: user._id };
+    if (language && language !== "all") {
+      matchUser.language = language;
+    }
+
+    // Time mode targets: 15, 30, 60, 120 seconds
+    const timeDurations = [15, 30, 60, 120];
+    const timePBs = await Promise.all(
+      timeDurations.map(async (duration) => {
+        const query = { ...matchUser, mode: "time", duration };
+        const topResult = await TestResult.findOne(query).sort({ wpm: -1, createdAt: -1 }).lean();
+        return {
+          duration,
+          label: `${duration}s`,
+          wpm: topResult ? topResult.wpm : null,
+          accuracy: topResult ? topResult.accuracy : null,
+          language: topResult ? topResult.language : (language || "english"),
+          date: topResult ? topResult.createdAt : null,
+        };
+      })
+    );
+
+    // Words mode targets: 10, 25, 50, 100 words
+    const wordCounts = [10, 25, 50, 100];
+    const wordsPBs = await Promise.all(
+      wordCounts.map(async (wordCount) => {
+        const query = { ...matchUser, mode: "words", wordCount };
+        const topResult = await TestResult.findOne(query).sort({ wpm: -1, createdAt: -1 }).lean();
+        return {
+          wordCount,
+          label: `${wordCount} words`,
+          wpm: topResult ? topResult.wpm : null,
+          accuracy: topResult ? topResult.accuracy : null,
+          language: topResult ? topResult.language : (language || "english"),
+          date: topResult ? topResult.createdAt : null,
+        };
+      })
+    );
+
+    // Quote mode targets: short, medium, long
+    const quoteLengths = ["short", "medium", "long"];
+    const quotePBs = await Promise.all(
+      quoteLengths.map(async (quoteLength) => {
+        const query = { ...matchUser, mode: "quote" };
+        let topResult;
+        if (quoteLength === "short") {
+          topResult = await TestResult.findOne({ ...query, wordCount: { $lt: 25 } }).sort({ wpm: -1, createdAt: -1 }).lean();
+        } else if (quoteLength === "medium") {
+          topResult = await TestResult.findOne({ ...query, wordCount: { $gte: 25, $lte: 60 } }).sort({ wpm: -1, createdAt: -1 }).lean();
+        } else {
+          topResult = await TestResult.findOne({ ...query, wordCount: { $gt: 60 } }).sort({ wpm: -1, createdAt: -1 }).lean();
+        }
+        return {
+          quoteLength,
+          label: quoteLength.charAt(0).toUpperCase() + quoteLength.slice(1),
+          wpm: topResult ? topResult.wpm : null,
+          accuracy: topResult ? topResult.accuracy : null,
+          language: topResult ? topResult.language : (language || "english"),
+          date: topResult ? topResult.createdAt : null,
+        };
+      })
+    );
+
+    return res.json({
+      time: timePBs,
+      words: wordsPBs,
+      quote: quotePBs,
     });
   } catch (err) {
     return next(err);

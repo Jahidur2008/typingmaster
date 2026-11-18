@@ -102,6 +102,7 @@ export async function submitResultToBackend(
     consistency: results.consistency,
     chars: results.chars,
     wpmPerSecond: results.history,
+    keyErrors: results.keyErrors || {},
   };
 
   const res = await fetch(`${API_URL}/api/results`, {

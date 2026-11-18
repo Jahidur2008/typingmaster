@@ -14,6 +14,7 @@ const { notFound, errorHandler } = require("./middleware/error");
 const { setupCompetitionSocket } = require("./services/competition-socket");
 const { seedChallenges } = require("./scripts/seed-challenges");
 const { seedLeaderboard } = require("./scripts/seed-leaderboard");
+const { seedBadges } = require("./services/gamification");
 
 const PORT = Number(process.env.PORT) || 4000;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || "http://localhost:3000";
@@ -26,6 +27,7 @@ async function main() {
 
   try {
     await connectDB();
+    await seedBadges();
     await seedChallenges();
     await seedLeaderboard();
   } catch (err) {

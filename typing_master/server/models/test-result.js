@@ -34,14 +34,18 @@ const testResultSchema = new mongoose.Schema(
     },
     /** Per-second series for the results graph. */
     wpmPerSecond: { type: [wpmSampleSchema], default: [] },
+    /** Key-level mistyped count map for weak-keys analytics */
+    keyErrors: { type: mongoose.Schema.Types.Mixed, default: {} },
   },
   { timestamps: true }, // createdAt / updatedAt
 );
 
 testResultSchema.index({ createdAt: -1 });
+testResultSchema.index({ user: 1, createdAt: -1 });
+testResultSchema.index({ user: 1, wpm: -1 });
+testResultSchema.index({ user: 1, mode: 1, language: 1, createdAt: -1 });
 testResultSchema.index({ mode: 1, duration: 1, language: 1, wpm: -1, createdAt: -1 });
 testResultSchema.index({ mode: 1, wordCount: 1, language: 1, wpm: -1, createdAt: -1 });
-testResultSchema.index({ user: 1, wpm: -1 });
 testResultSchema.index({ createdAt: -1, wpm: -1 });
 
 module.exports = mongoose.model("TestResult", testResultSchema);

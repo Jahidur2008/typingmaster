@@ -72,6 +72,8 @@ export interface TypingEngineState {
     rawWpm: number;
     errors: number;
   }>;
+  /** Cumulative error counts per character */
+  keyErrors: Record<string, number>;
 }
 
 export function createEngineState(
@@ -98,6 +100,7 @@ export function createEngineState(
     lastSampleRaw: 0,
     lastSampleErrors: 0,
     history: [],
+    keyErrors: {},
   };
 }
 
@@ -205,7 +208,7 @@ function tallyInsertions(
   word: string,
   prev: string,
   next: string,
-): { correct: number; incorrect: number; extra: number } {
+): { correct: number; incorrect: number; extra: number; mistypedKeys: string[] } {
   const target = splitGraphemes(word);
   const before = splitGraphemes(prev);
   const after = splitGraphemes(next);
@@ -217,13 +220,17 @@ function tallyInsertions(
   let correct = 0;
   let incorrect = 0;
   let extra = 0;
+  const mistypedKeys: string[] = [];
   for (let i = prefix; i < after.length; i++) {
     const weight = clusterCharWeight(after[i] || target[i] || "");
     if (i >= target.length) extra += weight;
     else if (after[i] === target[i]) correct += weight;
-    else incorrect += weight;
+    else {
+      incorrect += weight;
+      if (target[i]) mistypedKeys.push(target[i]);
+    }
   }
-  return { correct, incorrect, extra };
+  return { correct, incorrect, extra, mistypedKeys };
 }
 
 export function typingEngineReducer(
@@ -295,6 +302,15 @@ export function typingEngineReducer(
       const delta = tallyInsertions(state.words[index] ?? "", prev, action.value);
       typed[index] = action.value;
 
+      let keyErrors = state.keyErrors;
+      if (delta.mistypedKeys.length > 0) {
+        keyErrors = { ...state.keyErrors };
+        for (const k of delta.mistypedKeys) {
+          const lk = k.toLowerCase();
+          keyErrors[lk] = (keyErrors[lk] || 0) + 1;
+        }
+      }
+
       const isLast = index === state.words.length - 1;
       // Test ends when the final word is typed exactly (word-count modes only).
       const completesTest =
@@ -303,6 +319,7 @@ export function typingEngineReducer(
       return {
         ...state,
         typed,
+        keyErrors,
         startedAt: state.startedAt ?? action.now,
         correctKeystrokes: state.correctKeystrokes + delta.correct,
         incorrectKeystrokes: state.incorrectKeystrokes + delta.incorrect,
@@ -461,6 +478,8 @@ export interface TypingResults {
   };
   /** Per-second series for the results graph. */
   history: WpmSample[];
+  /** Mistyped key error frequency map */
+  keyErrors?: Record<string, number>;
 }
 
 export function computeResults(
@@ -476,6 +495,7 @@ export function computeResults(
     consistency: calcConsistency(state.samples),
     timeMs: elapsed,
     history: state.history,
+    keyErrors: state.keyErrors,
     chars: {
       correct,
       incorrect: state.incorrectKeystrokes,
